@@ -110,6 +110,7 @@
     },
     filters: {
       highlight(value, phrase) {
+        phrase = (phrase + '').replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1')
         return value.replace(new RegExp('('+phrase+')', 'gi'), '<strong>$1</strong>')
       }
     }
