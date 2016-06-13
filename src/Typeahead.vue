@@ -75,10 +75,6 @@
     },
     methods: {
       update() {
-        if (!this.query) {
-          this.reset()
-          return false
-        }
         if (this.data) {
           this.items = this.primitiveData
           this.showDropdown = this.items.length
