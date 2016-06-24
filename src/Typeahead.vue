@@ -24,6 +24,7 @@
 </template>
 
 <script type="text/babel">
+  import escape from './utils/escape'
   const typeahead = {
     created() {
       this.items = this.primitiveData
@@ -106,6 +107,7 @@
     },
     filters: {
       highlight(value, phrase) {
+        value = escape(value)
         phrase = (phrase + '').replace(/([.?*+^$[\]\\(){}|-])/g, '\\$1')
         return value.replace(new RegExp('('+phrase+')', 'gi'), '<strong>$1</strong>')
       }
