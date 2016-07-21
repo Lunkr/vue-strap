@@ -23,7 +23,7 @@
 
 </template>
 
-<script type="text/babel">
+<script lang="babel">
   import escape from './utils/escape'
   const typeahead = {
     created() {
@@ -57,11 +57,14 @@
       },
       placeholder: {
         type: String
+      },
+      showDropdown: {
+        type: Boolean,
+        default: false
       }
     },
     data() {
       return {
-        showDropdown: false,
         noResults: true,
         current: 0,
         items: [],
@@ -78,13 +81,12 @@
       update() {
         if (this.data) {
           this.items = this.primitiveData
-          this.showDropdown = this.items.length
+          this.showDropdown = !!this.items.length
         }
       },
       reset() {
         this.items = []
         this.query = ''
-        this.loading = false
         this.showDropdown = false
       },
       setActive(index) {
@@ -116,7 +118,7 @@
   export default typeahead
 </script>
 
-<style lang="less" rel="stylesheet/less">
+<style lang="less">
   >a{
     cursor: pointer;
   }
