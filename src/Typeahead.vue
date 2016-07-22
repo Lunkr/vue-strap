@@ -6,6 +6,7 @@
            :placeholder="placeholder"
            autocomplete="off"
            v-model="query"
+           @blur="blur"
            @input="update"
            @keydown.up="up"
            @keydown.down="down"
@@ -72,6 +73,10 @@
       showDropdown: {
         type: Boolean,
         default: false
+      },
+      onBlur: {
+        type: Function,
+        default: () => {}
       }
     },
     data() {
@@ -118,6 +123,10 @@
       down() {
         if (this.current < this.items.length - 1) this.current++
         _scrollIntoView(this.current, this.$el)
+      },
+      blur() {
+        this.showDropdown = false
+        this.onBlur()
       }
     },
     filters: {
