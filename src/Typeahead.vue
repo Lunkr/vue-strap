@@ -9,7 +9,7 @@
            @input="update"
            @keydown.up="up"
            @keydown.down="down"
-           @keydown.enter= "hit"
+           @keydown.enter="hit"
            @keydown.esc="reset"
     />
     <ul class="dropdown-menu" v-el:dropdown>
@@ -25,6 +25,17 @@
 
 <script lang="babel">
   import escape from './utils/escape'
+
+  function _scrollIntoView(index, el) {
+    let $el = el.querySelector('.dropdown-menu'),
+            scrollAmount = $el.querySelector('li').clientHeight,
+            newScrollUp = scrollAmount * index,
+            newScrollDown = scrollAmount * (index + 1) - $el.clientHeight
+    $el.scrollTop = newScrollUp <= $el.scrollTop ? newScrollUp
+            : newScrollDown >= $el.scrollTop ? newScrollDown
+            : $el.scrollTop
+  }
+
   const typeahead = {
     created() {
       this.items = this.primitiveData
@@ -102,9 +113,11 @@
       },
       up() {
         if (this.current > 0) this.current--
+        _scrollIntoView(this.current, this.$el)
       },
       down() {
         if (this.current < this.items.length - 1) this.current++
+        _scrollIntoView(this.current, this.$el)
       }
     },
     filters: {
