@@ -2,13 +2,13 @@
   <div
     v-show="show"
     v-bind:class="{
-      'alert':		true,
+      'alert':    true,
       'alert-success':(type == 'success'),
       'alert-warning':(type == 'warning'),
-      'alert-info':	(type == 'info'),
-      'alert-danger':	(type == 'danger'),
-      'top': 			(placement === 'top'),
-      'top-right': 	(placement === 'top-right')
+      'alert-info': (type == 'info'),
+      'alert-danger': (type == 'danger'),
+      'top':      (placement === 'top'),
+      'top-right':  (placement === 'top-right')
     }"
     transition="fade"
     v-bind:style="{width:width}"
@@ -17,15 +17,19 @@
       @click="show = false">
       <span>&times;</span>
     </button>
-    <slot></slot>
+    {{{message}}}
   </div>
 </template>
 
 <script>
-import coerceBoolean from './utils/coerceBoolean.js'
+  import Vue from 'vue'
+  import coerceBoolean from './utils/coerceBoolean.js'
 
   export default {
     props: {
+      message: {
+        type: String
+      },
       type: {
         type: String
       },
@@ -49,14 +53,48 @@ import coerceBoolean from './utils/coerceBoolean.js'
       },
       placement: {
         type: String
+      },
+      container: {
+        type: String,
+        default: '.vue-alert'
+      },
+    },
+    data() {
+      return {
+        $_parent_: null,
       }
     },
-    watch: {
-      show(val) {
-        if (this._timeout) clearTimeout(this._timeout)
-        if (val && Boolean(this.duration)) {
-          this._timeout = setTimeout(()=> this.show = false, this.duration)
+    created () {
+      let $parent = this.$parent
+      if (!$parent) {
+        let parent = document.querySelector(this.container)
+        if (!parent) {
+          parent = document.createElement('div')
+          parent.classList.add(this.container.replace('.', ''))
+          const Alert = Vue.extend()
+          $parent = new Alert({
+            el: parent
+          }).$appendTo(document.body)
         }
+        // Hacked.
+        this.$_parent_ = parent.__vue__
+      }
+    },
+    compiled () {
+      if (this.$_parent_) {
+        this.$appendTo(this.$_parent_.$el)
+        delete this.$_parent_
+      }
+    },
+    ready () {
+      if (this.duration > 0) {
+        this._timeout = setTimeout(() => this.close(), this.duration)
+      }
+    },
+    methods: {
+      close() {
+        clearTimeout(this._timeout)
+        this.$destroy(true)
       }
     }
   }
