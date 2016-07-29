@@ -1,28 +1,28 @@
 <template>
-<div class="carousel slide" data-ride="carousel">
-  <!-- Indicators -->
-  <ol class="carousel-indicators" v-show="indicators">
-    <indicator></indicator>
-  </ol>
-  <!-- Wrapper for slides -->
-  <div class="carousel-inner" role="listbox">
-    <slot></slot>
+  <div class="carousel slide" data-ride="carousel">
+    <!-- Indicators -->
+    <ol class="carousel-indicators" v-show="indicators && !(hideIndicatorsAtLast && lastSlider)">
+      <indicator :indicator.sync="indicator" :active-index.sync="activeIndex" :is-animating.sync="isAnimating"></indicator>
+    </ol>
+    <!-- Wrapper for slides -->
+    <div class="carousel-inner" role="listbox">
+      <slot></slot>
+    </div>
+    <!-- Controls -->
+    <div v-show="controls" class="carousel-controls hidden-xs">
+      <a class="left carousel-control" role="button" @click="prevClick" v-show="activeIndex">
+        <span class="lunkrfont lunkr-lastscene3x" aria-hidden="true"></span>
+      </a>
+      <a class="right carousel-control" role="button" @click="nextClick" v-show="!lastSlider">
+        <span class="lunkrfont lunkr-nextscene3x" aria-hidden="true"></span>
+      </a>
+    </div>
   </div>
-  <!-- Controls -->
-  <a v-show="controls" class="left carousel-control" @click="prevClick">
-    <span class="glyphicon glyphicon-chevron-left" aria-hidden="true"></span>
-    <span class="sr-only">Previous</span>
-  </a>
-  <a v-show="controls" class="right carousel-control" @click="nextClick">
-    <span class="glyphicon glyphicon-chevron-right" aria-hidden="true"></span>
-    <span class="sr-only">Next</span>
-  </a>
-</div>
 </template>
 
 <script>
-import EventListener from './utils/EventListener.js'
-import coerceBoolean from './utils/coerceBoolean.js'
+  import EventListener from './utils/EventListener.js'
+  import coerceBoolean from './utils/coerceBoolean.js'
 
   export default {
     props: {
@@ -39,15 +39,21 @@ import coerceBoolean from './utils/coerceBoolean.js'
       interval: {
         type: Number,
         default: 5000
+      },
+      hideIndicatorsAtLast: {
+        type: Boolean,
+        coerce: coerceBoolean,
+        default: false
       }
     },
     components: {
       'indicator': {
-        inherit: true,
-        template: '<li v-for="i in indicator" @click="handleIndicatorClick($index)" v-bind:class="{\'active\':$index === activeIndex}"</li>',
+        //inherit: true,
+        props: ['indicator', 'activeIndex', 'isAnimating'],
+        template: '<li v-for="i in indicator" @click="handleIndicatorClick($index)" v-bind:class="{\'active\':$index === activeIndex}"><span></span></li>',
         methods: {
           handleIndicatorClick(index) {
-            if (this.isAnimating) return false
+            if (this.isAnimating || this.activeIndex === index) return false
             this.isAnimating = true
             this.activeIndex = index
           }
@@ -64,6 +70,9 @@ import coerceBoolean from './utils/coerceBoolean.js'
     computed: {
       slider() {
         return this.$el.querySelectorAll('.item')
+      },
+      lastSlider() {
+        return this.activeIndex === this.slider.length - 1
       }
     },
     watch: {
@@ -122,5 +131,25 @@ import coerceBoolean from './utils/coerceBoolean.js'
 <style scoped>
   .carousel-control {
     cursor: pointer;
+    background-image: none;
+    width: 48px;
+    height: 48px;
+    top: 50%;
+    margin-top: -24px;
+    background-color: #999;
+    border-radius: 48px;
+    line-height: 48px;
+    text-align: center;
+    text-shadow: none;
+  }
+  .carousel-control.left{
+    margin-left: 20px;
+  }
+  .carousel-control.right{
+    margin-right: 20px;
+  }
+  .carousel-control >span{
+    font-size: 48px;
+    color: #fff;
   }
 </style>
